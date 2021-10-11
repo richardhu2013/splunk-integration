@@ -5,6 +5,7 @@ phases:
     commands:
       - echo Installing source NPM dependencies...
       - npm install
+      - npx cdk synth
   build:
     commands:
       - echo Build started on `date`

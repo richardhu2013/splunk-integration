@@ -12,7 +12,9 @@ phases:
       - echo Compiling the dist folder
   post_build:
     commands:
+      - npx cdk deploy
       - echo Build completed on `date`
+
 # Include only the files required for your application to run.
 artifacts:
   files:

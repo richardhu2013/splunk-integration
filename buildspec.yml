@@ -4,6 +4,8 @@ phases:
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
+      - cd app/lambda
+      - pwd
       - npm install
       - npx cdk synth
   build:
@@ -12,6 +14,7 @@ phases:
       - echo Compiling the dist folder lalallal
   post_build:
     commands:
+      - cd app/lambda
       - npx cdk deploy
       - echo Build completed on `date`
 

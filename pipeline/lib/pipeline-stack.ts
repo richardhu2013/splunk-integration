@@ -1,9 +1,55 @@
+import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as cdk from '@aws-cdk/core';
+import { App, Stack, StackProps, SecretValue } from '@aws-cdk/core';
 
-export class PipelineStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+export interface PipelineStackProps extends StackProps {
+  readonly githubToken: string;
+}
 
-    // The code that defines your stack goes here
+export class PipelineStack extends Stack {
+  constructor(app: App, id: string, props?: cdk.StackProps) {
+    super(app, id, props);
+
+    // Build CDK
+    const cdkBuild = new codebuild.Project(this, 'CdkBuild', {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: '0.2',
+        phases: {
+          install: {
+            commands: [
+              'cd ../../app/lambda',
+              'npm install'
+            ],
+          },
+          build: {
+            commands: [
+              'npm run build',
+              'npm run cdk synth -- -o dist'
+            ],
+          },
+        },
+        artifacts: {
+          'base-directory': 'dist',
+          files: [
+            'LambdaStack.template.json',
+          ],
+        },
+      }),
+      source: codebuild.Source.gitHub({
+        owner: 'cba-curator',
+        repo: 'splunk-integration',
+        webhook: true, // optional, default: true if `webhookFilters` were provided, false otherwise
+        webhookTriggersBatchBuild: true, // optional, default is false
+        webhookFilters: [
+          codebuild.FilterGroup
+            .inEventOf(codebuild.EventAction.PUSH)
+            .andBranchIs('master')
+            // .andCommitMessageIs('the commit message'),
+        ], // optional, by default all pushes and Pull Requests will trigger a build
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
+      },
+    });
   }
 }

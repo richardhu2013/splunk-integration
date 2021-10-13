@@ -20,6 +20,7 @@ export class PipelineStack extends Stack {
               'pwd',
               'cd app/lambda',
               'pwd',
+              'ls src',
               'npm install'
             ],
           },

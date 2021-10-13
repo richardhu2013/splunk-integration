@@ -17,14 +17,17 @@ export class PipelineStack extends Stack {
         phases: {
           install: {
             commands: [
-              'cd ../../app/lambda',
+              'pwd',
+              'cd app/lambda',
+              'pwd',
               'npm install'
             ],
           },
           build: {
             commands: [
               'npm run build',
-              'npm run cdk synth -- -o dist'
+              'npx cdk synth -- -o dist',
+              'npx cdk deploy'
             ],
           },
         },
@@ -36,10 +39,10 @@ export class PipelineStack extends Stack {
         },
       }),
       source: codebuild.Source.gitHub({
-        owner: 'cba-curator',
+        owner: 'richardhu2013',
         repo: 'splunk-integration',
         webhook: true, // optional, default: true if `webhookFilters` were provided, false otherwise
-        webhookTriggersBatchBuild: true, // optional, default is false
+        webhookTriggersBatchBuild: false, // optional, default is false
         webhookFilters: [
           codebuild.FilterGroup
             .inEventOf(codebuild.EventAction.PUSH)
@@ -48,7 +51,7 @@ export class PipelineStack extends Stack {
         ], // optional, by default all pushes and Pull Requests will trigger a build
       }),
       environment: {
-        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0,
+        buildImage: codebuild.LinuxBuildImage.STANDARD_5_0,
       },
     });
   }

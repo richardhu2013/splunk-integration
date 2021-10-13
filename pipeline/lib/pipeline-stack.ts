@@ -28,7 +28,7 @@ export class PipelineStack extends Stack {
             commands: [
               'npm run build',
               'npx cdk synth -- -o dist',
-              'npx cdk deploy'
+              'npx cdk deploy --require-approval=never'
             ],
           },
         },
